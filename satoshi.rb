@@ -1,6 +1,5 @@
 require 'sinatra'
 require 'open-uri'
-require 'sinatra/cross_origin'
 require 'json'
 
 set :port, 7654
@@ -12,6 +11,7 @@ $satoshi = 100000000.0
 
 def cache_prices
   $currency_json.each do |currency|
+    if currency["currency"] == "AUD"
     currency_code = currency["currency"]
     puts "Caching #{currency_code}..."
     $currencies[currency_code] = Hash.new
@@ -24,6 +24,7 @@ def cache_prices
     price = json["bpi"][currency_code]["rate_float"]
     $currencies[currency_code]["rate"] = price.round(2)
     $currencies[currency_code]["satoshis"] = ($satoshi / price).floor
+    end
   end
 end
 
@@ -35,7 +36,6 @@ get '/' do
   erb :index
 end
 
-
 get '/supported_currencies' do
   $currencies.to_json
 end
@@ -46,4 +46,9 @@ get '/price/:name' do
   else
     "error"
   end
+end
+
+get '/id' do
+  donation = ($currencies["AUD"]["satoshis"] / 100000000.0 / 2.0);
+  {:twitter => "airofaki", :btc_address => "1F2FiVoXBNbcvyCsfcqVNgLq", :amount => donation}.to_json
 end

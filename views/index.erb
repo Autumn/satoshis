@@ -45,8 +45,10 @@ function getCurrencies() {
         var currencyCode = row.insertCell(1);
         var currency = row.insertCell(2);
         var equals = row.insertCell(3);
-        var n_satoshis = row.insertCell(4);
-        var satoshis = row.insertCell(5);
+        var btc = row.insertCell(4);
+        var equals2 = row.insertCell(5);
+        var satoshis = row.insertCell(6);
+        
 
         one_dollar.innerHTML = "1.00"
         var codeString = "<a id=\"" + code + "\">" + code + "</a>";
@@ -54,26 +56,39 @@ function getCurrencies() {
         console.log(json[code]);
         currency.innerHTML = json[code].currency;
         equals.innerHTML = "=";
-        n_satoshis.innerHTML = json[code].satoshis;
-        satoshis.innerHTML = "Satoshis";
+        equals2.innerHTML = "=";
+        satoshis.innerHTML = json[code].satoshis + " Satoshis";
+        btc.innerHTML = "฿" + json[code].satoshis / 100000000.0;
       }
     }
   };
   xhr.send();
 }
 
-function getCurrency(code) {
-  var xhr = getRequester("/price/" + code);
-  xhr.onreadystatechange = function(e) {
+function getIdData() {
+  var xhr = getRequester('/id');
+  xhr.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-    }
-  };
-
+      var json = JSON.parse(this.responseText);
+      var twitter = document.getElementById('twitter');
+      var btc_address = document.getElementById('btc_address');
+      var twitter_a = document.createElement('a');
+      twitter_a.setAttribute('href', "http://twitter.com/" + json.twitter);
+      twitter_a.innerHTML = json.twitter;
+      btc_address_a = document.createElement('a');
+      btc_address_href = "bitcoin:" + json.btc_address + "?amount=" + json.amount
+      btc_address_a.setAttribute('href', btc_address_href);
+      btc_address_a.innerHTML = '1F2FiVoXBNbcvyCsfcqVNgLq';
+      twitter.appendChild(twitter_a);
+      btc_address.appendChild(btc_address_a);
+    } 
+  }
   xhr.send();
 }
 
 window.onload = function() {
   getCurrencies();
+  getIdData();
 }
 
 </script>
@@ -85,6 +100,12 @@ window.onload = function() {
 </table>
 <table id="currencies">
 </table>
+
+<div id="details">
+  <p id="twitter">@</p>
+  <p id="btc_address">฿</p>
+  <p id="source"><a href="https://github.com/Autumn/satoshis">source</a></p>
+</div>
 </body>
 <html>
 
