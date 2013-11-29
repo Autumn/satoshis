@@ -11,7 +11,6 @@ $satoshi = 100000000.0
 
 def cache_prices
   $currency_json.each do |currency|
-    if currency["currency"] == "AUD"
     currency_code = currency["currency"]
     puts "Caching #{currency_code}..."
     $currencies[currency_code] = Hash.new
@@ -24,7 +23,6 @@ def cache_prices
     price = json["bpi"][currency_code]["rate_float"]
     $currencies[currency_code]["rate"] = price.round(2)
     $currencies[currency_code]["satoshis"] = ($satoshi / price).floor
-    end
   end
 end
 
