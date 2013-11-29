@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<style>
+#table, #codes {
+  text-align: center;
+}
+</style>
+<script>
+function getRequester(res) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', res, true);
+  return xhr;
+}
+function getCurrencies() {
+  var xhr = getRequester("/supported_currencies")
+  xhr.onreadystatechange = function(e) {
+    if (this.readyState == 4 && this.status == 200) {
+      var json = JSON.parse(this.responseText);
+      
+      var table = document.getElementById('currencies');
+      var codes = document.getElementById('codes');
+      var codeRow = codes.insertRow(-1);
+        
+      var nCodes = 0;
+      var codesPerRow = 20;
+      for (code in json) {
+        console.log(json[code]);
+        if ((nCodes + 1) % codesPerRow == 0) {
+          codeRow = codes.insertRow(-1);
+          nCodes = 0;
+        } 
+
+        var a = document.createElement('a');
+        a.setAttribute('href', "#" + json[code].code)
+        a.innerHTML = json[code].code;
+        var codeCell = codeRow.insertCell(nCodes);
+        codeCell.appendChild(a);
+        nCodes++;
+
+        var row = table.insertRow(-1);
+        var one_dollar = row.insertCell(0);
+        var currencyCode = row.insertCell(1);
+        var currency = row.insertCell(2);
+        var equals = row.insertCell(3);
+        var n_satoshis = row.insertCell(4);
+        var satoshis = row.insertCell(5);
+
+        one_dollar.innerHTML = "1.00"
+        var codeString = "<a id=\"" + code + "\">" + code + "</a>";
+        currencyCode.innerHTML = codeString;
+        console.log(json[code]);
+        currency.innerHTML = json[code].currency;
+        equals.innerHTML = "=";
+        n_satoshis.innerHTML = json[code].satoshis;
+        satoshis.innerHTML = "Satoshis";
+      }
+    }
+  };
+  xhr.send();
+}
+
+function getCurrency(code) {
+  var xhr = getRequester("/price/" + code);
+  xhr.onreadystatechange = function(e) {
+    if (this.readyState == 4 && this.status == 200) {
+    }
+  };
+
+  xhr.send();
+}
+
+window.onload = function() {
+  getCurrencies();
+}
+
+</script>
+</head>
+
+<body>
+<h1>How Many Satoshis Can Your Dollar Buy?</h1>
+<table id="codes">
+</table>
+<table id="currencies">
+</table>
+</body>
+<html>
+
+
